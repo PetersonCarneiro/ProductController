@@ -1,8 +1,10 @@
 package com.br.ProductController.controller;
 
 import com.br.ProductController.domain.user.AuthenticationDTO;
+import com.br.ProductController.domain.user.LoginResponseDTO;
 import com.br.ProductController.domain.user.RegisterDTO;
 import com.br.ProductController.domain.user.User;
+import com.br.ProductController.infra.security.TokenService;
 import com.br.ProductController.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -18,13 +20,17 @@ public class AuthenticationController {
     private AuthenticationManager authenticationManager;
     @Autowired
     private UserRepository userRepository;
+    @Autowired
+    private TokenService tokenService;
 
     @PostMapping("/login")
     ResponseEntity login(@RequestBody  AuthenticationDTO authenticationDTO){
         var userNamePassword = new UsernamePasswordAuthenticationToken(authenticationDTO.login(), authenticationDTO.password());
         var auth = this.authenticationManager.authenticate(userNamePassword);
 
-        return  ResponseEntity.ok().build();
+        var token = tokenService.generateToken((User) auth.getPrincipal());
+
+        return  ResponseEntity.ok(new LoginResponseDTO(token));
     }
     @PostMapping("/register")
     public ResponseEntity register(@RequestBody RegisterDTO registerDTO){

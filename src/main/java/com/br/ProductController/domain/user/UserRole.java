@@ -1,5 +1,4 @@
 package com.br.ProductController.domain.user;
-
 public enum UserRole {
     ADMIN("admin"),
     USER("user");
